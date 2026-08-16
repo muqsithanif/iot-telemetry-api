@@ -1,0 +1,25 @@
+﻿# Brings up MySQL so the same code can be exercised against a real server
+# instead of SQLite. Nothing else in the project needs Docker.
+#
+#   docker compose up -d
+#   DATABASE_URL=mysql+pymysql://telemetry:telemetry@localhost:3306/telemetry uvicorn app.main:app
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: telemetry
+      MYSQL_USER: telemetry
+      MYSQL_PASSWORD: telemetry
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  mysql_data:
